@@ -5,6 +5,7 @@ import com.bridgelabz.addressBookApp.model.Contact;
 import com.bridgelabz.addressBookApp.repository.ContactRepository;
 import com.bridgelabz.addressBookApp.mapper.ContactMapper;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -41,7 +42,8 @@ public class ContactService {
                 .map(existingContact -> {
                     existingContact.setName(contactDTO.getName());
                     existingContact.setEmail(contactDTO.getEmail());
-                    existingContact.setPhone(contactDTO.getPhone()); // ✅ Fix: Update Phone Number
+                    existingContact.setPhone(contactDTO.getPhone());
+                    existingContact.setCity(contactDTO.getCity());
                     return contactMapper.toDTO(contactRepository.save(existingContact));
                 });
     }

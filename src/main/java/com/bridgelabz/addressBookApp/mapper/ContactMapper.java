@@ -13,6 +13,7 @@ public class ContactMapper {
         contactDTO.setName(contact.getName());
         contactDTO.setEmail(contact.getEmail());
         contactDTO.setPhone(contact.getPhone());
+        contactDTO.setCity(contact.getCity());
         return contactDTO;
     }
 
@@ -22,6 +23,7 @@ public class ContactMapper {
         contact.setName(contactDTO.getName());
         contact.setEmail(contactDTO.getEmail());
         contact.setPhone(contactDTO.getPhone());
+        contact.setCity(contactDTO.getCity());
         return contact;
     }
 }
