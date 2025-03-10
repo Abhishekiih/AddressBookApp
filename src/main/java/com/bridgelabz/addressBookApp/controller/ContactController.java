@@ -4,13 +4,16 @@ import com.bridgelabz.addressBookApp.dto.ContactDTO;
 import com.bridgelabz.addressBookApp.service.ContactService;
 import lombok.extern.slf4j.Slf4j; // Lombok import for SLF4J logging
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Optional;
 
 @Slf4j  // This annotation enables logging
 @RestController
+@Validated  // Enable validation for the controller
 @RequestMapping("/api/contacts")
 public class ContactController {
 
@@ -41,7 +44,7 @@ public class ContactController {
     }
 
     @PostMapping
-    public ResponseEntity<ContactDTO> addContact(@RequestBody ContactDTO contactDTO) {
+    public ResponseEntity<ContactDTO> addContact(@RequestBody @Valid ContactDTO contactDTO) {
         log.info("Adding new contact: {}", contactDTO);
         ContactDTO savedContact = contactService.addContact(contactDTO);
         log.info("Added new contact with ID: {}", savedContact.getId());
@@ -49,7 +52,7 @@ public class ContactController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ContactDTO> updateContact(@PathVariable Long id, @RequestBody ContactDTO contactDTO) {
+    public ResponseEntity<ContactDTO> updateContact(@PathVariable Long id, @RequestBody @Valid ContactDTO contactDTO) {
         log.info("Updating contact with ID: {}", id);
         Optional<ContactDTO> updatedContact = contactService.updateContact(id, contactDTO);
         return updatedContact.map(ResponseEntity::ok).orElseGet(() -> {
