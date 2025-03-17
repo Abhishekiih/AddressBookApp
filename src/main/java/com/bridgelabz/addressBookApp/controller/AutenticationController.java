@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import com.bridgelabz.addressBookApp.dto.LoginDTO;
+import com.bridgelabz.addressBookApp.dto.MailDTO;
 
 @RestController
 public class AutenticationController {
@@ -29,7 +30,11 @@ public class AutenticationController {
         return authenticationService.login(user);
     }
 
-
+    //==============================Sendmail======================//
+    @PostMapping(path="/sendMail")
+    public String sendMail(@RequestBody MailDTO user){ emailService.sendEmail(user.getTo(), user.getSubject(), user.getBody());
+        return "Mail Sent";
+    }
 
 
 }
