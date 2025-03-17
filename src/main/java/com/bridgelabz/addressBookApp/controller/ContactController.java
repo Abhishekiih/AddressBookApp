@@ -2,7 +2,7 @@ package com.bridgelabz.addressBookApp.controller;
 
 import com.bridgelabz.addressBookApp.dto.ContactDTO;
 import com.bridgelabz.addressBookApp.exceptions.AddressBookException;
-import com.bridgelabz.addressBookApp.service.ContactService;
+import com.bridgelabz.addressBookApp.service.IContactService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,9 +18,9 @@ import java.util.List;
 @RequestMapping("/api/contacts")
 public class ContactController {
 
-    private final ContactService contactService;
+    private final IContactService contactService;
 
-    public ContactController(ContactService contactService) {
+    public ContactController(IContactService contactService) {
         this.contactService = contactService;
     }
 

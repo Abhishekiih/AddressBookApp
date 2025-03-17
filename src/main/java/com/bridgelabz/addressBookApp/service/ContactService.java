@@ -12,7 +12,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-public class ContactService {
+public class ContactService implements IContactService {
 
     private final ContactRepository contactRepository;
     private final ContactMapper contactMapper;
@@ -22,6 +22,7 @@ public class ContactService {
         this.contactMapper = contactMapper;
     }
 
+    @Override
     public List<ContactDTO> getAllContacts() {
         try {
             return contactRepository.findAll()
@@ -33,6 +34,7 @@ public class ContactService {
         }
     }
 
+    @Override
     public ContactDTO getContactById(Long id) {
         try {
             Optional<Contact> contact = contactRepository.findById(id);
@@ -45,6 +47,7 @@ public class ContactService {
         }
     }
 
+    @Override
     public ContactDTO addContact(ContactDTO contactDTO) {
         try {
             Contact contact = contactMapper.toEntity(contactDTO);
@@ -54,6 +57,7 @@ public class ContactService {
         }
     }
 
+    @Override
     public ContactDTO updateContact(Long id, ContactDTO contactDTO) {
         try {
             Optional<Contact> existingContact = contactRepository.findById(id);
@@ -70,6 +74,7 @@ public class ContactService {
         }
     }
 
+    @Override
     public boolean deleteContact(Long id) {
         try {
             if (contactRepository.existsById(id)) {
