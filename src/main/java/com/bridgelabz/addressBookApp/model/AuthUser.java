@@ -1,5 +1,6 @@
 package com.bridgelabz.addressBookApp.model;
 
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -8,72 +9,33 @@ import jakarta.persistence.Id;
 @Entity
 public class AuthUser {
 
-    String name;
-    String email;
-    String phone;
-    String hashPass;
-    String token;
-
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    Long id;
+    private Long id;
 
-    public AuthUser() {
-    }
+    private String name;
+    private String email;
+    private String phone;  // 🔹 Phone will be used as password
+    private String hashPass;
+    private String token;
+
+    public AuthUser() {}
 
     public AuthUser(String name, String email, String phone, String hashPass) {
-        this.name=name;
+        this.name = name;
         this.email = email;
         this.phone = phone;
         this.hashPass = hashPass;
-
-        this.token="";
-        this.id = null;
+        this.token = "";
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
+    public Long getId() { return id; }
+    public String getName() { return name; }
+    public String getEmail() { return email; }
+    public String getPhone() { return phone; }
+    public String getHashPass() { return hashPass; }
+    public String getToken() { return token; }
 
-
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public void setPhone(String phone) {
-        this.phone= phone;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-
-    public String getEmail() {
-        return email;
-    }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public Long getId() {
-        return id;
-    }
-    public void setHashPass(String hashPass) {
-        this.hashPass = hashPass;
-    }
-
-    public String getHashPass() {
-        return hashPass;
-    }
-
-    public String getToken() {
-        return token;
-    }
-
-    public void setToken(String token) {
-        this.token = token;
-    }
+    public void setHashPass(String hashPass) { this.hashPass = hashPass; }
+    public void setToken(String token) { this.token = token; }
 }

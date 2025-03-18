@@ -6,16 +6,15 @@ import com.bridgelabz.addressBookApp.model.AuthUser;
 import com.bridgelabz.addressBookApp.repository.AuthUserRepository;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 @Service
 public class AuthenticationService {
 
-    AuthUserRepository userRepository;
-    EmailService emailService;
-    JwtTokenService jwtTokenService;
+    private final AuthUserRepository userRepository;
+    private final EmailService emailService;
+    private final JwtTokenService jwtTokenService;
+    private final BCryptPasswordEncoder bcrypt = new BCryptPasswordEncoder();
 
     public AuthenticationService(AuthUserRepository userRepository, EmailService emailService, JwtTokenService jwtTokenService) {
         this.userRepository = userRepository;
@@ -23,62 +22,72 @@ public class AuthenticationService {
         this.jwtTokenService = jwtTokenService;
     }
 
-    public String register(AuthUserDTO user){
-
-        List<AuthUser> l1 = userRepository.findAll().stream().filter(authuser -> user.getEmail().equals(authuser.getEmail())).collect(Collectors.toList());
-
-        if(l1.size()>0){
+    // 🔹 Register User
+    public String register(AuthUserDTO user) {
+        if (userRepository.findByEmail(user.getEmail()).isPresent()) {
             return "User already registered";
         }
 
-        //creating hashed password using bcrypt
-        BCryptPasswordEncoder bcrypt = new BCryptPasswordEncoder();
-        String hashPass = bcrypt.encode(user.getPhone());
-
-        //creating new user
+        String hashPass = bcrypt.encode(user.getPhone()); // 🔹 Hashing phone number as password
         AuthUser newUser = new AuthUser(user.getName(), user.getEmail(), user.getPhone(), hashPass);
-
-        //setting the new hashed password
-        newUser.setHashPass(hashPass);
-
-        //saving the user in the database
         userRepository.save(newUser);
 
-        //sending the confirmation mail to the user
-        emailService.sendEmail(user.getEmail(), "Regitration Status", user.getName()+" you are registered!");
-
-        return "user registered";
+        emailService.sendEmail(user.getEmail(), "Registration Successful", "Welcome, " + user.getName() + "!");
+        return "User registered successfully";
     }
 
+    // 🔹 Login User (Using Email & Phone)
+    public String login(LoginDTO user) {
+        Optional<AuthUser> foundUserOpt = userRepository.findByEmail(user.getEmail());
 
-    public String login(LoginDTO user){
-
-        List<AuthUser> l1 = userRepository.findAll().stream().filter(authuser -> authuser.getEmail().equals(user.getEmail())).collect(Collectors.toList());
-        if(l1.size() == 0)
+        if (foundUserOpt.isEmpty()) {
             return "User not registered";
+        }
 
-        AuthUser foundUser = l1.get(0);
+        AuthUser foundUser = foundUserOpt.get();
 
-        //matching the stored hashed password with the password provided by user
-        BCryptPasswordEncoder bcrypt = new BCryptPasswordEncoder();
+        if (!bcrypt.matches(user.getPhone(), foundUser.getHashPass())) {
+            return "Invalid phone number";
+        }
 
-        if(!bcrypt.matches(user.getPhone(), foundUser.getHashPass()))
-            return "Invalid password";
-
-        //creating Jwt Token
         String token = jwtTokenService.createToken(foundUser.getId());
-
-        //setting token for user login
         foundUser.setToken(token);
-
-        //saving the current status of user in database
         userRepository.save(foundUser);
 
-        return "user logged in"+"\ntoken : "+token;
+        return "User logged in\nToken: " + token;
     }
 
+    // 🔹 Forgot Password (Change Password Without Logging In)
+    public String forgotPassword(String email, String newPhone) {
+        Optional<AuthUser> userOpt = userRepository.findByEmail(email);
+        if (userOpt.isEmpty()) {
+            return "User not found";
+        }
 
+        AuthUser user = userOpt.get();
+        user.setHashPass(bcrypt.encode(newPhone));
+        userRepository.save(user);
 
+        emailService.sendEmail(email, "Password Reset", "Your password has been changed successfully!");
+        return "Password changed successfully!";
+    }
 
+    // 🔹 Reset Password (Change Password While Logged In)
+    public String resetPassword(String email, String currentPhone, String newPhone) {
+        Optional<AuthUser> userOpt = userRepository.findByEmail(email);
+        if (userOpt.isEmpty()) {
+            return "User not found";
+        }
 
+        AuthUser user = userOpt.get();
+
+        if (!bcrypt.matches(currentPhone, user.getHashPass())) {
+            return "Current phone number is incorrect!";
+        }
+
+        user.setHashPass(bcrypt.encode(newPhone));
+        userRepository.save(user);
+
+        return "Password reset successfully!";
+    }
 }
