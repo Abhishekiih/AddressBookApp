@@ -4,6 +4,8 @@ import com.bridgelabz.addressBookApp.dto.ContactDTO;
 import com.bridgelabz.addressBookApp.exceptions.AddressBookException;
 import com.bridgelabz.addressBookApp.service.IContactService;
 import lombok.extern.slf4j.Slf4j;
+import com.bridgelabz.addressBookApp.service.MessageProducer;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -18,11 +20,15 @@ import java.util.List;
 @RequestMapping("/api/contacts")
 public class ContactController {
 
-    private final IContactService contactService;
+    @Autowired
+    private IContactService contactService;
 
-    public ContactController(IContactService contactService) {
-        this.contactService = contactService;
-    }
+//    public ContactController(IContactService contactService) {
+//        this.contactService = contactService;
+//    }
+
+    @Autowired
+    private MessageProducer messageProducer;  // Inject RabbitMQ Producer
 
     @GetMapping
     public ResponseEntity<List<ContactDTO>> getAllContacts() {
@@ -65,6 +71,9 @@ public class ContactController {
             log.info("Adding new contact: {}", contactDTO);
             ContactDTO savedContact = contactService.addContact(contactDTO);
             log.info("Added new contact with ID: {}", savedContact.getId());
+
+            // Send the created contact details to RabbitMQ
+            messageProducer.sendMessage("New Contact Created: " + savedContact.toString());
             return ResponseEntity.status(HttpStatus.CREATED).body(savedContact);
         } catch (AddressBookException e) {
             log.error("Error adding contact: {}", e.getMessage());
@@ -113,5 +122,12 @@ public class ContactController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .build(); // return 500 for any other unexpected error
         }
+    }
+
+    // Send Contact Details to RabbitMQ
+    @PostMapping("/sendToQueue")
+    public ResponseEntity<String> sendToQueue(@RequestBody ContactDTO dto) {
+        messageProducer.sendMessage("Contact Info: " + dto.toString());
+        return ResponseEntity.ok("Contact sent to RabbitMQ successfully");
     }
 }
