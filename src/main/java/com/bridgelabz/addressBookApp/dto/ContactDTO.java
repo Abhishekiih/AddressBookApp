@@ -9,14 +9,18 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.io.Serial;
+import java.io.Serializable;
+
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
 @EqualsAndHashCode
-public class ContactDTO {
-
+public class ContactDTO  implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L;
     private Long id;
 
     @NotBlank(message = "Name is required")  // Ensures the name is not blank
