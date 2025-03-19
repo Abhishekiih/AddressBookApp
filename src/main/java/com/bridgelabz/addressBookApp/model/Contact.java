@@ -20,6 +20,7 @@ public class Contact {
     private String phone;
     private String city;
 
+
     public String getCity() {
         return city;
     }

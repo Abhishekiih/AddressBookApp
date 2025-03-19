@@ -30,4 +30,6 @@ public class ContactDTO  implements Serializable {
     private String email;
     private String phone;
     private String city;
+
+
 }
