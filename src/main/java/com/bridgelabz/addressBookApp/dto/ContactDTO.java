@@ -1,15 +1,10 @@
 package com.bridgelabz.addressBookApp.dto;
 
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
-import java.io.Serial;
 import java.io.Serializable;
 
 @Getter
@@ -18,18 +13,25 @@ import java.io.Serializable;
 @AllArgsConstructor
 @ToString
 @EqualsAndHashCode
-public class ContactDTO  implements Serializable {
-    @Serial
+public class ContactDTO implements Serializable {
     private static final long serialVersionUID = 1L;
+
     private Long id;
 
-    @NotBlank(message = "Name is required")  // Ensures the name is not blank
-    @Pattern(regexp = "^[A-Za-z ]+$", message = "Name must contain only letters and spaces") // Ensures the name only contains letters and spaces
+    @NotBlank(message = "Name is required")
+    @Pattern(regexp = "^[A-Za-z ]+$", message = "Name must contain only letters and spaces")
     private String name;
 
-    private String email;
+//    @Email(message = "Invalid email format")
+//    private String email;
+
+    @NotBlank(message = "Phone number is required")
     private String phone;
+
+    @NotBlank(message = "City is required")
     private String city;
 
-
+    private String address;
+    private String state;   // Added
+    private String zipCode; // Added
 }

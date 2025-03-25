@@ -19,8 +19,8 @@ import java.util.stream.Collectors;
 @Service
 public class ContactService implements IContactService {
 
-    private ContactRepository contactRepository;
-    private ContactMapper contactMapper;
+    private final ContactRepository contactRepository;
+    private final ContactMapper contactMapper;
 
     @Autowired
     public ContactService(ContactRepository contactRepository, ContactMapper contactMapper) {
@@ -30,15 +30,14 @@ public class ContactService implements IContactService {
 
     // ===================== GET ALL CONTACTS =====================
     @Override
-    @Cacheable(value = "contacts", key = "'contactList'")
+    @Cacheable(value = "contacts")
     public List<ContactDTO> getAllContacts() {
         try {
-            return contactRepository.findAll()
-                    .stream()
+            return contactRepository.findAll().stream()
                     .map(contactMapper::toDTO)
                     .collect(Collectors.toList());
         } catch (Exception e) {
-            throw new AddressBookException("Error fetching contacts: " + e.getMessage());
+            throw new AddressBookException("Error fetching all contacts: " + e.getMessage());
         }
     }
 
@@ -76,9 +75,14 @@ public class ContactService implements IContactService {
                     .orElseThrow(() -> new AddressBookException("Contact not found for update with ID: " + id));
 
             contact.setName(contactDTO.getName());
-            contact.setEmail(contactDTO.getEmail());
+//            contact.setEmail(contactDTO.getEmail());
             contact.setPhone(contactDTO.getPhone());
             contact.setCity(contactDTO.getCity());
+
+            // Ensure address, state, zipCode are updated
+            contact.setAddress(contactDTO.getAddress());
+            contact.setState(contactDTO.getState());
+            contact.setZipCode(contactDTO.getZipCode());
 
             return contactMapper.toDTO(contactRepository.save(contact));
         } catch (Exception e) {
